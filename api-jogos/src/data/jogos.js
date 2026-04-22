@@ -1,7 +1,0 @@
-const jogos = [
-  { id: 1, nome: "GTA V", genero: "Ação" },
-  { id: 2, nome: "FIFA 24", genero: "Esporte" },
-  { id: 3, nome: "Minecraft", genero: "Aventura" }
-];
-
-module.exports = jogos;

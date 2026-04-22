@@ -5,7 +5,6 @@ const jogosRoutes = require("./routes/jogos.routes");
 
 app.use(express.json());
 
-// usar rota
 app.use("/jogos", jogosRoutes);
 
 app.listen(3000, () => {
