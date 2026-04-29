@@ -3,71 +3,172 @@ const router = express.Router();
 
 const { readData, writeData } = require("../utils/fileHandler");
 
-// 🔹 GET ALL
+//  GET ALL
 router.get("/", (req, res) => {
-  const jogos = readData();
-  res.json(jogos);
+  try {
+    const jogos = readData();
+
+    res.status(200).json({
+      success: true,
+      data: jogos
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Erro ao buscar jogos"
+    });
+  }
 });
 
-// 🔹 GET BY ID
+// GET BY ID
 router.get("/:id", (req, res) => {
-  const jogos = readData();
-  const jogo = jogos.find(j => j.id == req.params.id);
+  try {
+    const id = Number(req.params.id);
 
-  if (!jogo) {
-    return res.status(404).json({ mensagem: "Jogo não encontrado" });
+    if (isNaN(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "ID inválido"
+      });
+    }
+
+    const jogos = readData();
+    const jogo = jogos.find(j => j.id === id);
+
+    if (!jogo) {
+      return res.status(404).json({
+        success: false,
+        message: "Jogo não encontrado"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: jogo
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Erro ao buscar jogo"
+    });
   }
-
-  res.json(jogo);
 });
 
-// 🔹 CREATE
+// CREATE
 router.post("/", (req, res) => {
-  const jogos = readData();
+  try {
+    const { nome, genero } = req.body;
 
-  const novoJogo = {
-    id: jogos.length ? jogos[jogos.length - 1].id + 1 : 1,
-    nome: req.body.nome,
-    genero: req.body.genero
-  };
+    if (!nome || !genero) {
+      return res.status(400).json({
+        success: false,
+        message: "Nome e gênero são obrigatórios"
+      });
+    }
 
-  jogos.push(novoJogo);
-  writeData(jogos);
+    const jogos = readData();
 
-  res.status(201).json(novoJogo);
+    const novoJogo = {
+      id: jogos.length ? jogos[jogos.length - 1].id + 1 : 1,
+      nome: nome.trim(),
+      genero: genero.trim()
+    };
+
+    jogos.push(novoJogo);
+    writeData(jogos);
+
+    res.status(201).json({
+      success: true,
+      data: novoJogo
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Erro ao criar jogo"
+    });
+  }
 });
 
-// 🔹 UPDATE
+// UPDATE (PATCH)
 router.patch("/:id", (req, res) => {
-  const jogos = readData();
-  const index = jogos.findIndex(j => j.id == req.params.id);
+  try {
+    const id = Number(req.params.id);
 
-  if (index === -1) {
-    return res.status(404).json({ mensagem: "Jogo não encontrado" });
+    if (isNaN(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "ID inválido"
+      });
+    }
+
+    const jogos = readData();
+    const index = jogos.findIndex(j => j.id === id);
+
+    if (index === -1) {
+      return res.status(404).json({
+        success: false,
+        message: "Jogo não encontrado"
+      });
+    }
+
+    jogos[index] = {
+      ...jogos[index],
+      ...req.body
+    };
+
+    writeData(jogos);
+
+    res.status(200).json({
+      success: true,
+      data: jogos[index]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Erro ao atualizar jogo"
+    });
   }
-
-  jogos[index] = {
-    ...jogos[index],
-    ...req.body
-  };
-
-  writeData(jogos);
-
-  res.json(jogos[index]);
 });
 
 // 🔹 DELETE
 router.delete("/:id", (req, res) => {
-  const jogos = readData();
-  const novosJogos = jogos.filter(j => j.id != req.params.id);
+  try {
+    const id = Number(req.params.id);
 
-  if (jogos.length === novosJogos.length) {
-    return res.status(404).json({ mensagem: "Jogo não encontrado" });
+    if (isNaN(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "ID inválido"
+      });
+    }
+
+    const jogos = readData();
+    const novosJogos = jogos.filter(j => j.id !== id);
+
+    if (jogos.length === novosJogos.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Jogo não encontrado"
+      });
+    }
+
+    writeData(novosJogos);
+
+    res.status(200).json({
+      success: true,
+      message: "Jogo removido com sucesso"
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Erro ao remover jogo"
+    });
   }
-
-  writeData(novosJogos);
-
-  res.json({ mensagem: "Jogo removido com sucesso" });
 });
 
 module.exports = router;
