@@ -1,174 +1,92 @@
-const express = require("express");
-const router = express.Router();
+import { Router } from "express";
 
-const { readData, writeData } = require("../utils/fileHandler");
+import {
+  getAll,
+  getById,
+  create,
+  updatePut,
+  updatePatch,
+  remove
+} from "../services/animais.service.js";
 
-// 🔹 GET ALL
+import { readData, writeData } from "../utils/fileHandler.js";
+
+const router = Router();
+
+// GET ALL
 router.get("/", (req, res) => {
-  try {
-    const animais = readData();
-
-    res.status(200).json({
-      success: true,
-      data: animais
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Erro ao buscar animais"
-    });
-  }
+  const data = getAll(readData);
+  res.json({ success: true, data });
 });
 
-// 🔹 GET BY ID
+// GET BY ID
 router.get("/:id", (req, res) => {
-  try {
-    const id = Number(req.params.id);
+  const id = Number(req.params.id);
 
-    if (isNaN(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "ID inválido"
-      });
-    }
-
-    const animais = readData();
-    const animal = animais.find(a => a.id === id);
-
-    if (!animal) {
-      return res.status(404).json({
-        success: false,
-        message: "Animal não encontrado"
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: animal
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Erro ao buscar animal"
-    });
+  if (isNaN(id)) {
+    return res.status(400).json({ success: false });
   }
+
+  const animal = getById(id, readData);
+
+  if (!animal) {
+    return res.status(404).json({ success: false });
+  }
+
+  res.json({ success: true, data: animal });
 });
 
-// 🔹 CREATE
+// POST
 router.post("/", (req, res) => {
   try {
-    const { nome, especie } = req.body;
-
-    if (!nome || !especie) {
-      return res.status(400).json({
-        success: false,
-        message: "Nome e espécie são obrigatórios"
-      });
-    }
-
-    const animais = readData();
-
-    const novoAnimal = {
-      id: animais.length ? animais[animais.length - 1].id + 1 : 1,
-      nome,
-      especie
-    };
-
-    animais.push(novoAnimal);
-    writeData(animais);
-
-    res.status(201).json({
-      success: true,
-      data: novoAnimal
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Erro ao criar animal"
-    });
+    const novo = create(req.body, readData, writeData);
+    res.status(201).json({ success: true, data: novo });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
   }
 });
 
-// 🔹 UPDATE
+// PUT
+router.put("/:id", (req, res) => {
+  const id = Number(req.params.id);
+
+  try {
+    const atualizado = updatePut(id, req.body, readData, writeData);
+
+    if (!atualizado) {
+      return res.status(404).json({ success: false });
+    }
+
+    res.json({ success: true, data: atualizado });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+});
+
+// PATCH
 router.patch("/:id", (req, res) => {
-  try {
-    const id = Number(req.params.id);
+  const id = Number(req.params.id);
 
-    if (isNaN(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "ID inválido"
-      });
-    }
+  const atualizado = updatePatch(id, req.body, readData, writeData);
 
-    const animais = readData();
-    const index = animais.findIndex(a => a.id === id);
-
-    if (index === -1) {
-      return res.status(404).json({
-        success: false,
-        message: "Animal não encontrado"
-      });
-    }
-
-    animais[index] = {
-      ...animais[index],
-      ...req.body
-    };
-
-    writeData(animais);
-
-    res.status(200).json({
-      success: true,
-      data: animais[index]
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Erro ao atualizar animal"
-    });
+  if (!atualizado) {
+    return res.status(404).json({ success: false });
   }
+
+  res.json({ success: true, data: atualizado });
 });
 
-// 🔹 DELETE
+// DELETE
 router.delete("/:id", (req, res) => {
-  try {
-    const id = Number(req.params.id);
+  const id = Number(req.params.id);
 
-    if (isNaN(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "ID inválido"
-      });
-    }
+  const ok = remove(id, readData, writeData);
 
-    const animais = readData();
-    const novosAnimais = animais.filter(a => a.id !== id);
-
-    if (animais.length === novosAnimais.length) {
-      return res.status(404).json({
-        success: false,
-        message: "Animal não encontrado"
-      });
-    }
-
-    writeData(novosAnimais);
-
-    res.status(200).json({
-      success: true,
-      message: "Animal removido com sucesso"
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Erro ao remover animal"
-    });
+  if (!ok) {
+    return res.status(404).json({ success: false });
   }
+
+  res.json({ success: true });
 });
 
-module.exports = router;
+export default router;

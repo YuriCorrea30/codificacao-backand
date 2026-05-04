@@ -1,12 +1,52 @@
 [
-  {"id": 1, "nome": "Tigre", "especie": "Felino"},
-  { "id": 2, "nome": "Elefante", "especie": "Mamífero" },
-  { "id": 3, "nome": "Cobra", "especie": "Réptil" },
-  { "id": 4, "nome": "Girafa", "especie": "Mamífero" },
-  { "id": 5, "nome": "Tubarão", "especie": "Peixe" },
-  { "id": 6, "nome": "Coruja", "especie": "Ave" },
-  { "id": 7, "nome": "Polvo", "especie": "Molusco" },
-  { "id": 8, "nome": "Canguru", "especie": "Mamífero" },
-  { "id": 9, "nome": "Sapo", "especie": "Anfíbio" },
-  { "id": 10, "nome": "Borboleta", "especie": "Inseto" }
+  {
+    "id": 1,
+    "nome": "Tigre",
+    "especie": "Felino"
+  },
+  {
+    "id": 2,
+    "nome": "Elefante",
+    "especie": "Mamífero"
+  },
+  {
+    "id": 3,
+    "nome": "Cobra",
+    "especie": "Réptil"
+  },
+  {
+    "id": 4,
+    "nome": "Girafa",
+    "especie": "Mamífero"
+  },
+  {
+    "id": 5,
+    "nome": "Tubarão",
+    "especie": "Peixe"
+  },
+  {
+    "id": 6,
+    "nome": "Coruja",
+    "especie": "Ave"
+  },
+  {
+    "id": 7,
+    "nome": "Polvo",
+    "especie": "Molusco"
+  },
+  {
+    "id": 8,
+    "nome": "Canguru",
+    "especie": "Mamífero"
+  },
+  {
+    "id": 9,
+    "nome": "Sapo",
+    "especie": "Anfíbio"
+  },
+  {
+    "id": 10,
+    "nome": "Borboleta",
+    "especie": "Inseto"
+  }
 ]

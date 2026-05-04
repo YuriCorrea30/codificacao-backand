@@ -1,9 +1,11 @@
-const express = require("express");
+import express from "express";
+import animaisRoutes from "./routes/animais.routes.js";
+
 const app = express();
-const animaisRoutes = require("./routes/animais.routes");
 
 app.use(express.json());
 app.use("/animais", animaisRoutes);
+
 app.listen(3000, () => {
-    console.log("Servidor rodando na porta 3000")
-})
+  console.log("Servidor rodando na porta 3000");
+}); 
