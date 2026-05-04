@@ -1,33 +1,28 @@
 import { Router } from "express";
-
-import {
-  getAll,
-  getById,
-  create,
-  updatePut,
-  updatePatch,
-  remove
-} from "../services/animais.service.js";
-
+import { animaisService } from "../services/aminais.service.js";
 import { readData, writeData } from "../utils/fileHandler.js";
 
 const router = Router();
 
 // GET ALL
-router.get("/", (req, res) => {
-  const data = getAll(readData);
-  res.json({ success: true, data });
+router.get("/", async (req, res) => {
+  try {
+    const data = await animaisService.getAll(readData);
+    res.json({ success: true, data });
+  } catch {
+    res.status(500).json({ success: false });
+  }
 });
 
 // GET BY ID
-router.get("/:id", (req, res) => {
+router.get("/:id", async (req, res) => {
   const id = Number(req.params.id);
 
   if (isNaN(id)) {
     return res.status(400).json({ success: false });
   }
 
-  const animal = getById(id, readData);
+  const animal = await animaisService.getById(id, readData);
 
   if (!animal) {
     return res.status(404).json({ success: false });
@@ -37,9 +32,10 @@ router.get("/:id", (req, res) => {
 });
 
 // POST
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   try {
-    const novo = create(req.body, readData, writeData);
+    const novo = await animaisService.create(req.body, readData, writeData);
+
     res.status(201).json({ success: true, data: novo });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
@@ -47,11 +43,16 @@ router.post("/", (req, res) => {
 });
 
 // PUT
-router.put("/:id", (req, res) => {
+router.put("/:id", async (req, res) => {
   const id = Number(req.params.id);
 
   try {
-    const atualizado = updatePut(id, req.body, readData, writeData);
+    const atualizado = await animaisService.updatePut(
+      id,
+      req.body,
+      readData,
+      writeData
+    );
 
     if (!atualizado) {
       return res.status(404).json({ success: false });
@@ -64,10 +65,15 @@ router.put("/:id", (req, res) => {
 });
 
 // PATCH
-router.patch("/:id", (req, res) => {
+router.patch("/:id", async (req, res) => {
   const id = Number(req.params.id);
 
-  const atualizado = updatePatch(id, req.body, readData, writeData);
+  const atualizado = await animaisService.updatePatch(
+    id,
+    req.body,
+    readData,
+    writeData
+  );
 
   if (!atualizado) {
     return res.status(404).json({ success: false });
@@ -77,10 +83,10 @@ router.patch("/:id", (req, res) => {
 });
 
 // DELETE
-router.delete("/:id", (req, res) => {
+router.delete("/:id", async (req, res) => {
   const id = Number(req.params.id);
 
-  const ok = remove(id, readData, writeData);
+  const ok = await animaisService.remove(id, readData, writeData);
 
   if (!ok) {
     return res.status(404).json({ success: false });

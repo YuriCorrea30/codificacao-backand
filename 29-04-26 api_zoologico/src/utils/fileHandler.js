@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -7,11 +7,11 @@ const __dirname = path.dirname(__filename);
 
 const filePath = path.join(__dirname, "../data/animais.json");
 
-export function readData() {
-  const data = fs.readFileSync(filePath, "utf-8");
+export async function readData() {
+  const data = await fs.readFile(filePath, "utf-8");
   return JSON.parse(data);
 }
 
-export function writeData(data) {
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+export async function writeData(data) {
+  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
 }

@@ -1,75 +1,80 @@
-export const getAll = (readData) => {
-  return readData();
-};
+class AnimaisService {
 
-export const getById = (id, readData) => {
-  const animais = readData();
-  return animais.find(a => a.id === id);
-};
-
-export const create = (body, readData, writeData) => {
-  const { nome, especie } = body;
-
-  if (!nome || !especie) {
-    throw new Error("Nome e espécie são obrigatórios");
+  async getAll(readData) {
+    return await readData();
   }
 
-  const animais = readData();
-
-  const novo = {
-    id: animais.length ? animais[animais.length - 1].id + 1 : 1,
-    nome,
-    especie
-  };
-
-  animais.push(novo);
-  writeData(animais);
-
-  return novo;
-};
-
-export const updatePut = (id, body, readData, writeData) => {
-  const { nome, especie } = body;
-
-  if (!nome || !especie) {
-    throw new Error("Nome e espécie são obrigatórios");
+  async getById(id, readData) {
+    const animais = await readData();
+    return animais.find(a => a.id === id);
   }
 
-  const animais = readData();
-  const index = animais.findIndex(a => a.id === id);
+  async create(body, readData, writeData) {
+    const { nome, especie } = body;
 
-  if (index === -1) return null;
+    if (!nome || !especie) {
+      throw new Error("Nome e espécie são obrigatórios");
+    }
 
-  const atualizado = { id, nome, especie };
+    const animais = await readData();
 
-  animais[index] = atualizado;
-  writeData(animais);
+    const novo = {
+      id: animais.length ? animais[animais.length - 1].id + 1 : 1,
+      nome,
+      especie
+    };
 
-  return atualizado;
-};
+    animais.push(novo);
+    await writeData(animais);
 
-export const updatePatch = (id, body, readData, writeData) => {
-  const animais = readData();
-  const index = animais.findIndex(a => a.id === id);
+    return novo;
+  }
 
-  if (index === -1) return null;
+  async updatePut(id, body, readData, writeData) {
+    const { nome, especie } = body;
 
-  animais[index] = {
-    ...animais[index],
-    ...body
-  };
+    if (!nome || !especie) {
+      throw new Error("Nome e espécie são obrigatórios");
+    }
 
-  writeData(animais);
+    const animais = await readData();
+    const index = animais.findIndex(a => a.id === id);
 
-  return animais[index];
-};
+    if (index === -1) return null;
 
-export const remove = (id, readData, writeData) => {
-  const animais = readData();
-  const novos = animais.filter(a => a.id !== id);
+    const atualizado = { id, nome, especie };
 
-  if (animais.length === novos.length) return false;
+    animais[index] = atualizado;
+    await writeData(animais);
 
-  writeData(novos);
-  return true;
-};
+    return atualizado;
+  }
+
+  async updatePatch(id, body, readData, writeData) {
+    const animais = await readData();
+    const index = animais.findIndex(a => a.id === id);
+
+    if (index === -1) return null;
+
+    animais[index] = {
+      ...animais[index],
+      ...body
+    };
+
+    await writeData(animais);
+
+    return animais[index];
+  }
+
+  async remove(id, readData, writeData) {
+    const animais = await readData();
+    const novos = animais.filter(a => a.id !== id);
+
+    if (animais.length === novos.length) return false;
+
+    await writeData(novos);
+    return true;
+  }
+}
+
+export const animaisService = new AnimaisService();
