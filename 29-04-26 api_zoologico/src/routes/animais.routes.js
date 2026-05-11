@@ -1,10 +1,13 @@
 import { Router } from "express";
+//buscar animais
 import { animaisService } from "../services/aminais.service.js";
+//ler arquivos
 import { readData, writeData } from "../utils/fileHandler.js";
 
 const router = Router();
 
-// GET ALL
+// GET ALL retorna todos os animais
+//Essa rota GET busca todos os animais usando o service e retorna os dados em JSON. Se ocorrer algum erro, retorna status 500.
 router.get("/", async (req, res) => {
   try {
     const data = await animaisService.getAll(readData);
@@ -14,35 +17,36 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET BY ID
+// GET BY ID busca por id
 router.get("/:id", async (req, res) => {
   const id = Number(req.params.id);
 
-  if (isNaN(id)) {
-    return res.status(400).json({ success: false });
+ //verifica se o id é invalido
+ if (isNaN(id)) {
+    return res.status(404).json({ success: false }); 
   }
 
-  const animal = await animaisService.getById(id, readData);
+  const animal = await animaisService.getById(id, readData); //chama o servidor
 
   if (!animal) {
-    return res.status(404).json({ success: false });
+    return res.status(404).json({ success: false }); //se não existir retorna 404 erro
   }
 
-  res.json({ success: true, data: animal });
+  res.json({ success: true, data: animal }); //retorna animal JSON
 });
 
-// POST
+// POST cria um novo animal
 router.post("/", async (req, res) => {
   try {
     const novo = await animaisService.create(req.body, readData, writeData);
 
     res.status(201).json({ success: true, data: novo });
   } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    res.status(404).json({ success: false, message: err.message });
   }
 });
 
-// PUT
+// PUT atualiza tudo
 router.put("/:id", async (req, res) => {
   const id = Number(req.params.id);
 
@@ -64,7 +68,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// PATCH
+// PATCH atualiza parcialmente
 router.patch("/:id", async (req, res) => {
   const id = Number(req.params.id);
 
@@ -82,7 +86,7 @@ router.patch("/:id", async (req, res) => {
   res.json({ success: true, data: atualizado });
 });
 
-// DELETE
+// DELETE remove um animal
 router.delete("/:id", async (req, res) => {
   const id = Number(req.params.id);
 
